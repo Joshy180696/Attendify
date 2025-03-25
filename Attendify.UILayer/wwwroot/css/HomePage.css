@@ -1,0 +1,43 @@
+﻿.toast-custom.toast-info {
+    background-color: dimgray; /* Light grey */
+    color: #212529; /* Dark text for contrast */
+}
+
+.toast-custom .toast-progress {
+    background-color: #212529; /* Grey progress bar */
+}
+
+.modal-content {
+    background: #f8f9fa; /* Light grey to match Toastr */
+    border-radius: 8px;
+}
+
+.modal-header {
+    background: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.btn-primary {
+    background: #007bff;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background: #0056b3;
+    }
+
+.gap-3 {
+    gap: 1rem; /* Space between date picker and button */
+}
+
+.date-picker {
+    max-width: 200px;
+}
+
+.invalid-feedback {
+    display: block; /* Always show when populated */
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}

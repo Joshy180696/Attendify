@@ -1,0 +1,240 @@
+﻿@using Attendify.DomainLayer.Helpers
+@using Attendify.DomainLayer.DTO
+@model PaginatedList<EventListDto>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+@section Styles {
+    <link href="~/css/Paginator.css" rel="stylesheet" />
+    <link href="~/css/EventCard.css" rel="stylesheet" />
+    <link href="~/css/HomePage.css" rel="stylesheet" />
+}
+
+<div class="text-center d-flex justify-content-between align-items-center mb-4">
+    <h2 class="display-4">Events</h2>
+    <div class="d-flex align-items-center gap-3">
+        <div class="date-picker">
+            <input type="date" id="eventDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="loadEventsByDate()" />
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+    </div>
+</div>
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="event-container">
+        <div class="event-card empty-state">
+            <h3>No Events Today</h3>
+            <p class="date">Looks like it’s a quiet day!</p>
+            <p>Why not kick things off? <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+        </div>
+    </div>
+}else{
+    <div class="container my-5" id="eventsContainer">
+        @await Html.PartialAsync("_EventsList", Model)
+    </div>
+}
+
+<!-- Create Event Modal -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEventModalLabel">Create New Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createEventForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" required maxlength="100" minlength="2" pattern="^[a-zA-Z0-9\s\-\.\,\!\?]+$" />
+                        <div class="invalid-feedback" id="title-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" maxlength="500" pattern="^[a-zA-Z0-9\s\-\.\,\!\?'" \(\)]+$"></textarea>
+                        <div class="invalid-feedback" id="description-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateTime" class="form-label">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="dateTime" required min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" value="@DateTime.Today.ToString("yyyy-MM-ddTHH:mm")" />
+                        <div class="invalid-feedback" id="dateTime-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" required maxlength="200" minlength="2" pattern="^[a-zA-Z0-9\s\-\.\,\#\/]+$" />
+                        <div class="invalid-feedback" id="location-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createdBy" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="createdBy" required maxlength="50" minlength="2" pattern="^[a-zA-Z\s-']+$" />
+                        <div class="invalid-feedback" id="createdBy-error"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitCreateEvent()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<input type="hidden" id="pageSize" value="1" /> 
+
+@section Scripts {
+    <script>
+        toastr.options = {
+               positionClass: "toast-top-right",
+               timeOut: 3000,
+               progressBar: true,
+               "toastClass": "toast-custom" // Custom class for styling
+        };
+
+        function loadPage(event, link) {
+              event.preventDefault();
+              const relativeUrl = link.getAttribute('href');
+              const baseUrl = window.location.origin;
+              const fullUrl = new URL(relativeUrl, baseUrl);
+              const dateInput = document.getElementById('eventDate').value;
+              const [year, month, day] = dateInput.split('-');
+              const pageSize = document.getElementById('pageSize').value;
+
+              const params = new URLSearchParams(fullUrl.search);
+              params.set('year', year);
+              params.set('month', month);
+              params.set('day', day);
+              params.set('pageSize', pageSize);
+
+              fetch(`${fullUrl.pathname}?${params.toString()}`)
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      return response.json();
+                  })
+                  .then(data => {
+                      const container = document.querySelector('#eventsContainer');
+                      if (data.isEmpty) {
+                          const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
+                          toastr.info(`No events for ${selectedDate}`);
+          
+                          document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+                      } else if (container) {
+                          container.innerHTML = data.html;
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Error loading page:', error);
+                      toastr.error('Failed to load events. Please try again.');
+                  });
+          }
+
+        function loadEventsByDate() {
+            const dateInput = document.getElementById('eventDate').value;
+            const [year, month, day] = dateInput.split('-');
+            const pageSize = document.getElementById('pageSize').value;
+
+            const url = '@Url.Action("LoadEvents", "Home")';
+            const params = new URLSearchParams({
+                year: year,
+                month: month,
+                day: day,
+                pageNumber: 1,
+                pageSize: pageSize,
+                searchString: ''
+            });
+
+            fetch(`${url}?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.querySelector('#eventsContainer');
+                    if (data.isEmpty) {
+                        const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
+                        toastr.info(`No events for ${selectedDate}`);
+                    
+                        document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+                    } else if (container) {
+                        container.innerHTML = data.html;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading events:', error);
+                    toastr.error('Failed to load events. Please try again.');
+                });
+        }
+
+        function submitCreateEvent() {
+            const form = document.getElementById('createEventForm');
+         
+            document.querySelectorAll('.invalid-feedback').forEach(el => {
+                el.textContent = '';
+                el.parentElement.querySelector('.form-control').classList.remove('is-invalid');
+            });
+
+            if (form.checkValidity()) {
+                const eventData = {
+                    Title: document.getElementById('title').value,
+                    Description: document.getElementById('description').value,
+                    DateTime: document.getElementById('dateTime').value,
+                    Location: document.getElementById('location').value,
+                    CreatedBy: document.getElementById('createdBy').value
+                };
+
+                console.log('Sending event data:', JSON.stringify(eventData));
+                console.log('CSRF Token:', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                fetch('@Url.Action("Create", "Home")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify(eventData)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        return response.json().then(data => { throw data; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('createEventModal').classList.remove('show');
+                    document.body.classList.remove('modal-open');
+                    document.querySelector('.modal-backdrop').remove();
+                    form.reset();
+                    toastr.success('Event created successfully!');
+                    loadEventsByDate();
+                })
+                .catch(error => {
+                    console.error('Error creating event:', error);
+                    if (error.errors) {
+                        Object.keys(error.errors).forEach(field => {
+                            const errorDiv = document.getElementById(`${field.toLowerCase()}-error`);
+                            const input = document.getElementById(field.toLowerCase());
+                            if (errorDiv && input) {
+                                errorDiv.textContent = error.errors[field].join(', ');
+                                input.classList.add('is-invalid');
+                            }
+                        });
+                    } else {
+                        toastr.error('Failed to create event: ' + (error.message || 'Unknown error'));
+                    }
+                });
+            } else {
+                form.reportValidity();
+                console.log('Form validation failed');
+            }
+        }
+    </script>
+}

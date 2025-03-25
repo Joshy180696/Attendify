@@ -1,0 +1,164 @@
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+:root {
+  box-sizing: border-box;
+  
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #F0F4FF;
+}
+
+.media {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.5em;
+  background-color: #eee;
+  border-radius: 0.5em;
+  gap: 1.5em; /* Replaces margin-left for better spacing control */
+  margin-bottom: 1em; /* Space between multiple media objects */
+}
+@media (max-width: 768px) {
+  .media {
+    flex-direction: column; /* Stack on mobile */
+    padding: 1em; /* Reduce padding on mobile for tighter layout */
+  }
+  .media .media__image {
+    margin-right: 0; /* Reset margin for mobile */
+    width: 100%; /* Full width on mobile */
+  }
+  .media .media__body {
+    margin-top: 1em; /* Space between image and content on mobile */
+  }
+}
+@media (min-width: 769px) and (max-width: 1200px) {
+  .media {
+    padding: 1.25em; /* Slightly reduced padding for tablets */
+  }
+  .media .media__image {
+    flex-shrink: 0; /* Prevent image from shrinking on larger screens */
+    max-width: 200px; /* Medium image size for tablets */
+  }
+}
+@media (min-width: 1201px) {
+  .media {
+    padding: 2em; /* Increased padding for desktops */
+  }
+  .media .media__image {
+    flex-shrink: 0;
+    max-width: 300px; /* Larger image size for desktops */
+  }
+}
+
+.media--reverse {
+  flex-direction: row-reverse; /* Image on the right, content on the left */
+}
+@media (max-width: 768px) {
+  .media--reverse {
+    flex-direction: column; /* Stack on mobile, image first */
+  }
+}
+
+.media--multiple .media__image + .media__image {
+  margin-left: 1em; /* Space between multiple images */
+}
+@media (max-width: 768px) {
+  .media--multiple .media__image {
+    width: 100%; /* Full width for each image on mobile */
+    margin-left: 0; /* Reset margin for mobile stacking */
+  }
+}
+
+.media--small {
+  padding: 1em;
+}
+.media--small .media__image {
+  max-width: 100px; /* Smaller image for compact layouts */
+}
+@media (min-width: 769px) {
+  .media--small .media__image {
+    max-width: 150px; /* Slightly larger on desktop */
+  }
+}
+
+.media__image {
+  float: left; /* Maintain for older browsers or fallback */
+  margin-right: 1.5em;
+  max-width: 150px; /* Default image width */
+  height: auto;
+  object-fit: cover; /* Ensure images scale properly */
+}
+
+.media__image--large {
+  max-width: 300px; /* Larger image for desktop */
+}
+@media (max-width: 768px) {
+  .media__image--large {
+    max-width: 100%; /* Full width on mobile */
+  }
+}
+
+.media__body {
+  overflow: auto;
+  margin-top: 0;
+  flex-grow: 1; /* Allow content to grow and fill space */
+  color: #333; /* Ensure readable text color for accessibility */
+}
+
+.media__body > h4 {
+  margin-top: 0;
+  margin-bottom: 0.5em; /* Space below heading */
+  color: #222; /* Slightly darker for contrast */
+}
+
+/* Accessibility Enhancements */
+.media:focus {
+  outline: 2px solid #007bff; /* Visible focus outline for keyboard navigation */
+}
+
+.media__image[src*="placehold.co"] {
+  background-color: #ccc; /* Fallback background for placeholder images */
+}
+
+.button {
+  padding: 1em 1.25em;
+  border: 1px solid #265559;
+  border-radius: 0.2em;
+  background-color: transparent;
+  font-size: 0.8rem;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button--success {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.button--danger {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.button--small {
+  font-size: 0.8rem;
+}
+
+.button--large {
+  font-size: 1.2rem;
+}
+
+

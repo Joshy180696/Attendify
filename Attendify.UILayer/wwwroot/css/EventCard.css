@@ -1,0 +1,53 @@
+﻿.event-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.event-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    transition: transform 0.2s;
+}
+
+    .event-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .event-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.5em;
+        color: #333;
+    }
+
+    .event-card .date {
+        color: #666;
+        font-style: italic;
+    }
+
+    .event-card .location, .event-card .creator {
+        margin: 5px 0;
+    }
+
+    .event-card p {
+        color: #555;
+    }
+
+.empty-state {
+    background: #f8f9fa; /* Light gray to stand out */
+    border: 2px dashed #ccc; /* Dashed border for a "placeholder" vibe */
+    text-align: center;
+}
+
+    .empty-state h3 {
+        color: #6c757d; /* Muted gray */
+    }
+
+    .empty-state .btn {
+        margin-top: 10px;
+    }
