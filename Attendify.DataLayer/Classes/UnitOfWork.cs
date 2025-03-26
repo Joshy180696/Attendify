@@ -15,12 +15,14 @@ namespace Attendify.DataLayer.Classes
         private readonly ILogger<UnitOfWork> _logger;
 
         public IEventsRepository EventsRepository { get; }
+        public IRSVPRepository RSVPRepository { get; }
 
-        public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IEventsRepository eventsRepository)
+        public UnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger, IEventsRepository eventsRepository, IRSVPRepository rsvpRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context)); 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             EventsRepository = eventsRepository ?? throw new ArgumentNullException(nameof(eventsRepository));
+            RSVPRepository = rsvpRepository ?? throw new ArgumentNullException(nameof(rsvpRepository));
         }
 
         public async Task<int> CommitAsync()

@@ -20,8 +20,15 @@ namespace Attendify.DataLayer.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
             modelBuilder.Entity<Event>().HasKey(e => e.Id);
-            modelBuilder.Entity<RSVP>().HasKey(r => r.Id);
-            modelBuilder.Entity<RSVP>().HasOne(r => r.Event).WithMany().HasForeignKey(r => r.EventId);
+
+            modelBuilder.Entity<RSVP>()
+                .HasKey(r => r.Id);
+
+            modelBuilder.Entity<RSVP>()
+                .HasOne(r => r.Event)
+                .WithMany(e => e.RSVPs) // Ensure Event has a list of RSVPs
+                .HasForeignKey(r => r.EventId) // Explicitly set EventId as the foreign key
+                .OnDelete(DeleteBehavior.Cascade); // Define behavior on delete
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -11,17 +11,19 @@
     <link href="~/css/HomePage.css" rel="stylesheet" />
 }
 
+<!-- Title and Date picker plus create btn -->
 <div class="text-center d-flex justify-content-between align-items-center mb-4">
-    <h2 class="display-4">Events</h2>
+    <h2 class="display-4">Welcome</h2>
     <div class="d-flex align-items-center gap-3">
         <div class="date-picker">
             <input type="date" id="eventDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="loadEventsByDate()" />
         </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
     </div>
 </div>
 <hr />
 
+<!-- Partial container -->
 @if (!Model.Any())
 {
     <div class="event-container">
@@ -77,24 +79,62 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitCreateEvent()">Create</button>
+                <button type="button" class="btn btn-success" onclick="submitCreateEvent()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create RSVP Modal -->
+<div class="modal fade" id="rsvpModal" tabindex="-1" aria-labelledby="rsvpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rsvpModalLabel">RSVP to Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rsvpForm">
+                    @Html.AntiForgeryToken()
+                  
+                    <div class="mb-3">
+                        <label for="rsvpUserName" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="rsvpUserName" required>
+                        <div class="invalid-feedback" id="rsvpUserName-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rsvpResponse" class="form-label">Will you attend?</label>
+                        <select class="form-select" id="rsvpResponse" required>
+                            <option value="" disabled selected>Choose...</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="Maybe">Maybe</option>
+                        </select>
+                        <div class="invalid-feedback" id="rsvpResponse-error"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="submitRSVPFromModal()">Submit RSVP</button>
             </div>
         </div>
     </div>
 </div>
 
 
-<input type="hidden" id="pageSize" value="1" /> 
+<input type="hidden" id="pageSize" value="5" /> 
 
 @section Scripts {
     <script>
+//------------------------------------------------------------------------------------------------------------- toastr 
         toastr.options = {
                positionClass: "toast-top-right",
                timeOut: 3000,
                progressBar: true,
-               "toastClass": "toast-custom" // Custom class for styling
+               "toastClass": "toast-custom" 
         };
-
+//-------------------------------------------------------------------------------------------------------------- Pagination
         function loadPage(event, link) {
               event.preventDefault();
               const relativeUrl = link.getAttribute('href');
@@ -103,7 +143,6 @@
               const dateInput = document.getElementById('eventDate').value;
               const [year, month, day] = dateInput.split('-');
               const pageSize = document.getElementById('pageSize').value;
-
               const params = new URLSearchParams(fullUrl.search);
               params.set('year', year);
               params.set('month', month);
@@ -111,13 +150,13 @@
               params.set('pageSize', pageSize);
 
               fetch(`${fullUrl.pathname}?${params.toString()}`)
-                  .then(response => {
+               .then(response => {
                       if (!response.ok) {
                           throw new Error('Network response was not ok');
                       }
                       return response.json();
-                  })
-                  .then(data => {
+               })
+               .then(data => {
                       const container = document.querySelector('#eventsContainer');
                       if (data.isEmpty) {
                           const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
@@ -127,18 +166,17 @@
                       } else if (container) {
                           container.innerHTML = data.html;
                       }
-                  })
-                  .catch(error => {
+                })
+                .catch(error => {
                       console.error('Error loading page:', error);
                       toastr.error('Failed to load events. Please try again.');
-                  });
+                });
           }
-
-        function loadEventsByDate() {
+//-------------------------------------------------------------------------------------------------------- Filter Data
+            function loadEventsByDate() {
             const dateInput = document.getElementById('eventDate').value;
             const [year, month, day] = dateInput.split('-');
             const pageSize = document.getElementById('pageSize').value;
-
             const url = '@Url.Action("LoadEvents", "Home")';
             const params = new URLSearchParams({
                 year: year,
@@ -147,9 +185,8 @@
                 pageNumber: 1,
                 pageSize: pageSize,
                 searchString: ''
-            });
-
-            fetch(`${url}?${params.toString()}`)
+                });
+                fetch(`${url}?${params.toString()}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -171,14 +208,18 @@
                     console.error('Error loading events:', error);
                     toastr.error('Failed to load events. Please try again.');
                 });
-        }
-
-        function submitCreateEvent() {
+            }
+//------------------------------------------------------------------------------------------------------- Handle Event Creation
+            function submitCreateEvent() {
             const form = document.getElementById('createEventForm');
-         
+
+            // Clear previous errors and invalid states
             document.querySelectorAll('.invalid-feedback').forEach(el => {
                 el.textContent = '';
-                el.parentElement.querySelector('.form-control').classList.remove('is-invalid');
+                const input = el.parentElement.querySelector('.form-control, .form-select'); // Catch both
+                if (input) { // Check if input exists
+                    input.classList.remove('is-invalid');
+                }
             });
 
             if (form.checkValidity()) {
@@ -209,9 +250,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    document.getElementById('createEventModal').classList.remove('show');
-                    document.body.classList.remove('modal-open');
-                    document.querySelector('.modal-backdrop').remove();
+                    bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide(); // Cleaner close
                     form.reset();
                     toastr.success('Event created successfully!');
                     loadEventsByDate();
@@ -235,6 +274,56 @@
                 form.reportValidity();
                 console.log('Form validation failed');
             }
+        }     
+//--------------------------------------------------------------------------------------------------------------------------------- Handles RSVP
+        let currentEventId = null; 
+
+        function openRSVPModal(evId){
+            currentEventId = evId;
+        }
+
+        function submitRSVPFromModal() {
+            console.log('submitRSVPFromModal called'); 
+            const form = document.getElementById('rsvpForm');
+            if (!form.checkValidity()) {
+                console.log('Form validation failed'); 
+                form.reportValidity();
+                return;
+            }
+            const userName = document.getElementById('rsvpUserName').value;
+            const response = document.getElementById('rsvpResponse').value;
+            const evId = currentEventId;
+            console.log('Before payload, currentEventId:', currentEventId); 
+            const payload = { evId, userName, response };
+            console.log('Sending RSVP payload:', JSON.stringify(payload)); 
+
+            fetch('@Url.Action("RSVP", "Home")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ evId, userName, response })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw data; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    toastr.success(data.message);
+                    bootstrap.Modal.getInstance(document.getElementById('rsvpModal')).hide();
+                    form.reset()
+                    loadEventsByDate(); 
+                } else {
+                    toastr.error(data.message);
+                }
+            })
+            .catch(error => {
+                toastr.error(error.error || 'Failed to RSVP');
+            });
         }
     </script>
 }

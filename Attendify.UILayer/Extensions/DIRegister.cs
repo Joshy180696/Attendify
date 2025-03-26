@@ -20,11 +20,11 @@ namespace Attendify.UILayer.Extensions
             });
 
             services.AddHttpContextAccessor();
-            //services.AddScoped<IUserContext, AspNetUserContextAdapter>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEventsRepository, SqlEventsRepository>();
             services.AddScoped<IEventService, EventsService>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
+            services.AddScoped<IRSVPRepository, SqlRSVPRepository>();
 
             services.AddDbContext<AppDbContext>(opt =>
             {

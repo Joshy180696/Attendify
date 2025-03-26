@@ -73,6 +73,59 @@ namespace Attendify.DomainLayer.Classes
             }
         }
 
+        public async Task<(int rsvpId, bool success, string message)> AddRSVPAsync(CreateRSVPDto newRSVP)
+        {
+            if (newRSVP == null)
+            {
+                return (0, false, "RSVP data cannot be null");
+            }
+            if (string.IsNullOrEmpty(newRSVP.userName) || string.IsNullOrEmpty(newRSVP.response))
+            {
+                return (0, false, "Name and response are required");
+            }
+            if (!new[] { "Yes", "No", "Maybe" }.Contains(newRSVP.response))
+            {
+                return (0, false, "Response must be Yes, No, or Maybe");
+            }
+
+            var eventEntity = await _unitOfWork.EventsRepository.GetEventList()
+                .FirstOrDefaultAsync(e => e.Id == newRSVP.evId);
+            if (eventEntity == null)
+            {
+                return (0, false, "Event not found");
+            }
+            if (eventEntity.DateTime < DateTime.UtcNow)
+            {
+                return (0, false, "Cannot RSVP to past events");
+            }
+
+            try
+            {
+                var rsvpEntity = CreateNewRSVPEntity(newRSVP);
+                _unitOfWork.RSVPRepository.CreateRSVP(rsvpEntity);
+                await _unitOfWork.CommitAsync();
+                _logger.LogInformation("RSVP created successfully for event {EventId}: {@RSVP}", newRSVP.evId, rsvpEntity);
+                return (rsvpEntity.Id, true, "RSVP created successfully!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating RSVP for event {EventId}: {@RSVP}", newRSVP.evId, newRSVP);
+                throw; // Rethrow—let controller catch and format
+            }
+        }
+
+        private RSVP CreateNewRSVPEntity(CreateRSVPDto newRSVP)
+        {
+            RSVP newRSVPEntity = new RSVP()
+            {
+                EventId = newRSVP.evId,
+                UserName = newRSVP.userName,
+                Response = newRSVP.response,
+                RSVPDate = DateTime.UtcNow
+            };
+            return newRSVPEntity;
+        }
+
         private Event CreateNewEventEntity(CreateEventDto newEvent)
         {
             Event ev = new Event()

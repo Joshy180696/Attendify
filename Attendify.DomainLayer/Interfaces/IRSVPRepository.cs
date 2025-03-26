@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Attendify.DomainLayer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Attendify.DomainLayer.Interfaces
 {
-    public interface IUserContext
+    public interface IRSVPRepository
     {
-        bool IsInRole(Role role);
+        void CreateRSVP(RSVP rsvp);
+
     }
-    public enum Role { CanCreateEvents }
 }

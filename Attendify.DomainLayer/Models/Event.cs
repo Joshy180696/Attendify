@@ -14,5 +14,6 @@ namespace Attendify.DomainLayer.Models
         public DateTime DateTime { get; set; } // When it’s happening
         public string Location { get; set; } = string.Empty; // Where it’s at
         public string CreatedBy { get; set; } = string.Empty; // Simple string for now (could expand to a User model later)
+        public List<RSVP> RSVPs { get; set; } = new List<RSVP>(); // One-to-many
     }
 }

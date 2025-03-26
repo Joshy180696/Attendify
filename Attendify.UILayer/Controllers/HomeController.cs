@@ -3,6 +3,7 @@ using Attendify.DomainLayer.Interfaces;
 using Attendify.UILayer.Interface;
 using Attendify.UILayer.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace Attendify.UILayer.Controllers
@@ -27,7 +28,7 @@ namespace Attendify.UILayer.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var eventList = await _eventService.GetAllPaginatedEventsAsync(1, 1, string.Empty, null, null, null);
+            var eventList = await _eventService.GetAllPaginatedEventsAsync(1, 5, string.Empty, null, null, null);
 
             return View(eventList);
         }
@@ -44,7 +45,7 @@ namespace Attendify.UILayer.Controllers
             var events = await _eventService.GetAllPaginatedEventsAsync(
                 model.pageNumber,
                 model.pageSize,
-                model.searchString ?? "",
+                model.searchString ?? string.Empty,
                 model.year,
                 model.month,
                 model.day
@@ -69,7 +70,7 @@ namespace Attendify.UILayer.Controllers
                 var errors = ModelState
                .Where(m => m.Value.Errors.Any())
                .ToDictionary(
-                   kvp => kvp.Key, // Field name (e.g., "Title")
+                   kvp => kvp.Key, 
                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray() // Array of error messages
                );
                 _logger.LogWarning("Validation failed: {@Errors}", errors);
@@ -79,6 +80,25 @@ namespace Attendify.UILayer.Controllers
             _logger.LogInformation("Event created successfully: {@Event}", eventDto);
             return Json(new { success = true });
         }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> RSVP([FromBody] CreateRSVPDto rsvpDto)
+        {
+            _logger.LogInformation("Received RSVP DTO: {@RSVP}", rsvpDto); // Debug what’s coming in
+
+            try
+            {
+                var (rsvpId, success, message) = await _eventService.AddRSVPAsync(rsvpDto);
+                return Json(new { rsvpId, success, message }); 
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Error processing RSVP for event {EventId}", rsvpDto.evId);
+                return BadRequest(new { success = false, error = "Failed to RSVP" });
+            }
+        }
+
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

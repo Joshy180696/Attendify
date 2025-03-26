@@ -12,6 +12,18 @@
             <p class="location"><strong>Location:</strong> @ev.Location</p>
             <p class="creator"><strong>By:</strong> @ev.CreatedBy</p>
             <p>@ev.Description</p>
+            @if (ev.DateTime > DateTime.UtcNow)
+            {
+
+                <div class="text-center">    
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#rsvpModal" onclick="openRSVPModal('@ev.Id')">RSVP</button>
+                </div>
+         
+            }
+            else
+            {
+                <span class="text-muted">Event has passed</span>
+            }
         </div>
     }
 </div>

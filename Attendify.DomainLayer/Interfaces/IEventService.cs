@@ -15,5 +15,6 @@ namespace Attendify.DomainLayer.Interfaces
 
         Task<int> AddEventAsync(CreateEventDto newEvent);
 
+        Task<(int rsvpId, bool success, string message)> AddRSVPAsync(CreateRSVPDto newRSVP);
     }
 }
