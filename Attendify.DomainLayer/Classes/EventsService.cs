@@ -4,6 +4,7 @@ using Attendify.DomainLayer.Interfaces;
 using Attendify.DomainLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
 
 
 
@@ -20,7 +21,8 @@ namespace Attendify.DomainLayer.Classes
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<PaginatedList<EventListDto>> GetAllPaginatedEventsAsync(int pageNumber, int pageSize, string searchString, int? year = null, int? month = null, int? day = null)
+        public async Task<PaginatedList<EventListDto>> GetAllPaginatedEventsAsync(int pageNumber, int pageSize, string searchString, int? year = null, int? month = null, int? day = null,
+            bool showAll = false, string sortBy = "", string sortDirection = "asc")
         {
             var eventsQuery = _unitOfWork.EventsRepository.GetEventList();
 
@@ -28,7 +30,12 @@ namespace Attendify.DomainLayer.Classes
             year ??= DateTime.UtcNow.Year;
             month ??= DateTime.UtcNow.Month;
             day ??= DateTime.UtcNow.Day;
-            eventsQuery = eventsQuery.Where(e => e.DateTime.Year == year && e.DateTime.Month == month && e.DateTime.Day == day);
+
+            if (!showAll)
+            {
+                eventsQuery = eventsQuery.Where(e => e.DateTime.Year == year && e.DateTime.Month == month && e.DateTime.Day == day);
+            }
+           
 
             // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
@@ -37,15 +44,38 @@ namespace Attendify.DomainLayer.Classes
                                                      e.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                bool isAscending = sortDirection?.ToLower() == "asc";
+                eventsQuery = sortBy.ToLower() switch
+                {
+                    "date" => isAscending
+                        ? eventsQuery.OrderBy(e => e.DateTime).ThenByDescending(e => e.RSVPs.Count())
+                        : eventsQuery.OrderByDescending(e => e.DateTime).ThenByDescending(e => e.RSVPs.Count()),
+                    "rsvpcount" => isAscending
+                        ? eventsQuery.OrderBy(e => e.RSVPs.Count()).ThenByDescending(e => e.DateTime)
+                        : eventsQuery.OrderByDescending(e => e.RSVPs.Count()).ThenByDescending(e => e.DateTime),
+                    _ => eventsQuery.OrderByDescending(e => e.DateTime)
+                };
+            }
+            else
+            {
+                eventsQuery = eventsQuery.OrderByDescending(e => e.DateTime);
+            }
+
+           
+
             // Project to DTO and paginate
-            var eventDtosQuery = eventsQuery.Select(item => new EventListDto
+            var eventDtosQuery = eventsQuery
+                .Select(item => new EventListDto
             {
                 Id = item.Id,
                 Title = item.Title,
                 Description = item.Description,
                 DateTime = item.DateTime,
                 CreatedBy = item.CreatedBy,
-                Location = item.Location
+                Location = item.Location,
+                RSVPCount = item.RSVPs.Count()
             });
 
             return await PaginatedList<EventListDto>.CreateAsync(eventDtosQuery, pageNumber, pageSize);
@@ -113,6 +143,33 @@ namespace Attendify.DomainLayer.Classes
                 throw; // Rethrow—let controller catch and format
             }
         }
+
+
+        public async Task<EventListDto> GetEventDetailsAsync(int rsvpId)
+        {
+            var eventEntity = await _unitOfWork.EventsRepository.GetEventListWithDetails()
+                 .FirstOrDefaultAsync(e => e.Id == rsvpId);
+
+
+            if (eventEntity == null) 
+            {
+                return null;      
+            }
+
+            return new EventListDto
+            {
+                Id = eventEntity.Id,
+                Title = eventEntity.Title,
+                DateTime = eventEntity.DateTime,
+                RSVPs = eventEntity.RSVPs.Select(r => new RSVPDetailsDto
+                {
+                    UserName = r.UserName,
+                    Response = r.Response,
+                    RSVPDate = r.RSVPDate,
+                }).ToList()
+            };
+        }
+
 
         private RSVP CreateNewRSVPEntity(CreateRSVPDto newRSVP)
         {

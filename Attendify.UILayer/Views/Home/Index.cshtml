@@ -17,6 +17,7 @@
     <div class="d-flex align-items-center gap-3">
         <div class="date-picker">
             <input type="date" id="eventDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="loadEventsByDate()" />
+          
         </div>
         <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
     </div>
@@ -77,9 +78,9 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="submitCreateEvent()">Create</button>
+            <div class="modal-footer" style="justify-content:center;">
+                
+                    <button type="button" class="btn btn-info btn-sm" onclick="submitCreateEvent()">Create</button>
             </div>
         </div>
     </div>
@@ -87,7 +88,7 @@
 
 <!-- Create RSVP Modal -->
 <div class="modal fade" id="rsvpModal" tabindex="-1" aria-labelledby="rsvpModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="rsvpModalLabel">RSVP to Event</h5>
@@ -114,9 +115,9 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="submitRSVPFromModal()">Submit RSVP</button>
+            <div class="modal-footer" style="justify-content:center;">
+                
+                    <button type="button" class="btn btn-info btn-sm" onclick="submitRSVPFromModal()">Submit RSVP</button>    
             </div>
         </div>
     </div>
@@ -127,14 +128,14 @@
 
 @section Scripts {
     <script>
-//------------------------------------------------------------------------------------------------------------- toastr 
+//-------------------------------------------------------------------------------------------------------------------------------- toastr 
         toastr.options = {
                positionClass: "toast-top-right",
                timeOut: 3000,
                progressBar: true,
                "toastClass": "toast-custom" 
         };
-//-------------------------------------------------------------------------------------------------------------- Pagination
+//-------------------------------------------------------------------------------------------------------------------------------- Pagination
         function loadPage(event, link) {
               event.preventDefault();
               const relativeUrl = link.getAttribute('href');
@@ -172,7 +173,7 @@
                       toastr.error('Failed to load events. Please try again.');
                 });
           }
-//-------------------------------------------------------------------------------------------------------- Filter Data
+//---------------------------------------------------------------------------------------------------------------------------------- Filter Data
             function loadEventsByDate() {
             const dateInput = document.getElementById('eventDate').value;
             const [year, month, day] = dateInput.split('-');
@@ -209,7 +210,7 @@
                     toastr.error('Failed to load events. Please try again.');
                 });
             }
-//------------------------------------------------------------------------------------------------------- Handle Event Creation
+//----------------------------------------------------------------------------------------------------------------------------------- Handle Event Creation
             function submitCreateEvent() {
             const form = document.getElementById('createEventForm');
 

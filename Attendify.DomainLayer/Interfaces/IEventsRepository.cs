@@ -12,8 +12,8 @@ namespace Attendify.DomainLayer.Interfaces
     {
         IQueryable<Event> GetEventList();
         void CreateEvent(Event newEvent);
+        IQueryable<Event> GetEventListWithDetails();
 
-       
-       
+
     }
 }

@@ -1,0 +1,42 @@
+﻿@using Attendify.DomainLayer.DTO
+@model EventListDto
+
+@section Styles {
+    <link href="~/css/DetailsPage.css" rel="stylesheet" />
+}
+
+<div class="text-center d-flex justify-content-between align-items-center mb-4">
+    <h2 class="display-4">@Model.Title</h2>
+</div>
+<hr />
+
+
+<div class="container my-5">
+    <p><strong>Date:</strong> <span class="text-info"> @Model.DateTime.ToString("MMMM d, yyyy - HH:mm", System.Globalization.CultureInfo.InvariantCulture)</span></p>
+    <h3>RSVPs</h3>
+
+    @if (Model.RSVPs.Any())
+    {
+        <div class="rsvp-list-container">
+            <ul class="rsvp-list list-group">
+                @foreach (var rsvp in Model.RSVPs)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            @rsvp.UserName -
+                            <span class="response-@rsvp.Response.ToLower()">@rsvp.Response</span>
+                        </span>
+                        <span class="text-muted">@rsvp.RSVPDate.ToString("MMMM d, yyyy - HH:mm", System.Globalization.CultureInfo.InvariantCulture)</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <p>No RSVPs yet!</p>
+    }
+
+    <a asp-controller="Events" asp-action="Index" class="btn btn-info mt-3">Back to Events</a>
+</div>
+

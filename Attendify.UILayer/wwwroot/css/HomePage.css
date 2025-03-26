@@ -34,6 +34,12 @@
     max-width: 200px;
 }
 
+    .date-picker input {
+        border: 1px solid #17a2b8;
+        border-radius: 4px;
+        padding: 5px;
+    }
+
 .invalid-feedback {
     display: block; /* Always show when populated */
 }
@@ -96,4 +102,18 @@
             width: 100%;
             margin-top: 10px;
         }
+}
+.empty-state {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+.empty-state .btn-primary {
+    font-size: 1.1rem;
+    padding: 10px 20px;
 }

@@ -53,12 +53,16 @@ namespace Attendify.UILayer.Controllers
 
             bool isEmpty = !events.Any();
 
-    
             var renderHtml = await _viewRenderService.RenderViewToStringAsync("_EventsList", events, ControllerContext);
 
             return Json(new { html = renderHtml, pageNumber = model.pageNumber, isEmpty });
         }
 
+        /// <summary>
+        /// Create a new event
+        /// </summary>
+        /// <param name="eventDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Create([FromBody] CreateEventDto eventDto)
@@ -71,7 +75,7 @@ namespace Attendify.UILayer.Controllers
                .Where(m => m.Value.Errors.Any())
                .ToDictionary(
                    kvp => kvp.Key, 
-                   kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray() // Array of error messages
+                   kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray() 
                );
                 _logger.LogWarning("Validation failed: {@Errors}", errors);
                 return BadRequest(new { success = false, errors });
@@ -81,11 +85,16 @@ namespace Attendify.UILayer.Controllers
             return Json(new { success = true });
         }
 
+        /// <summary>
+        /// Create a new rsvp for event
+        /// </summary>
+        /// <param name="rsvpDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> RSVP([FromBody] CreateRSVPDto rsvpDto)
         {
-            _logger.LogInformation("Received RSVP DTO: {@RSVP}", rsvpDto); // Debug what’s coming in
+            _logger.LogInformation("Received RSVP DTO: {@RSVP}", rsvpDto);
 
             try
             {
@@ -98,8 +107,6 @@ namespace Attendify.UILayer.Controllers
                 return BadRequest(new { success = false, error = "Failed to RSVP" });
             }
         }
-
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

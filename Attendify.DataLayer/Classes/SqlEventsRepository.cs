@@ -1,6 +1,7 @@
 ﻿using Attendify.DataLayer.Context;
 using Attendify.DomainLayer.Interfaces;
 using Attendify.DomainLayer.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,20 @@ namespace Attendify.DataLayer.Classes
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving events list");
+                throw;
+            }
+        }
+
+
+        public IQueryable<Event> GetEventListWithDetails()
+        {
+            try
+            {
+                return _context.Events.Include(e => e.RSVPs).AsQueryable();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving events list with details");
                 throw;
             }
         }

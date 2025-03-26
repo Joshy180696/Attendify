@@ -1,0 +1,112 @@
+﻿@using Attendify.DomainLayer.Helpers
+@using Attendify.DomainLayer.DTO
+@model PaginatedList<EventListDto>
+@{
+    ViewData["Title"] = "Events";
+}
+@section Styles {
+    <link href="~/css/EventsPage.css" rel="stylesheet" />
+    <link href="~/css/Paginator.css" rel="stylesheet" />
+    <link href="~/css/Spinner.css" rel="stylesheet" />
+}
+
+<div class="text-center d-flex justify-content-between align-items-center mb-4">
+    <h2 class="display-4">Events History</h2>
+</div>
+<hr />
+
+<div class="container my-5" id="eventsTableContainer">
+    <!-- Spinner -->
+    <div id="loadingSpinner" class="text-center my-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Partial view content -->
+    <div id="eventsContent">
+        @if (!Model.Any())
+        {
+            <p>No events available. <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Create one now!</a></p>
+        }
+        else
+        {
+            @await Html.PartialAsync("_EventsTable", Model)
+        }
+    </div>
+</div>
+
+<input type="hidden" id="pageSize" value="10" />
+
+@section Scripts {
+    <script>
+        function loadPage(event, link) {
+            event.preventDefault();
+            const relativeUrl = link.getAttribute('href');
+            const baseUrl = window.location.origin;
+            const fullUrl = new URL(relativeUrl, baseUrl);
+            const pageSize = document.getElementById('pageSize').value;
+
+            const params = new URLSearchParams(fullUrl.search);
+            params.set('year', null);
+            params.set('month', null);
+            params.set('day', null);
+            params.set('pageSize', pageSize);
+            params.set('showAll', true);
+
+            // Preserve sort parameters
+            const sortBy = new URLSearchParams(window.location.search).get('sortBy');
+            const sortDirection = new URLSearchParams(window.location.search).get('sortDirection');
+            if (sortBy) params.set('sortBy', sortBy);
+            if (sortDirection) params.set('sortDirection', sortDirection);
+
+            const spinner = document.querySelector('#loadingSpinner');
+            const eventsContent = document.querySelector('#eventsContent');
+
+            // Show spinner, fade out content
+            spinner.style.display = "block";
+            eventsContent.style.opacity = "0";
+            eventsContent.style.transition = "opacity 0.3s ease";
+
+            fetch(`${fullUrl.pathname}?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Expect JSON from controller
+                })
+                .then(data => {
+                    if (data.html) {
+                        eventsContent.innerHTML = data.html; // Render partial HTML
+                        spinner.style.display = "none";
+                        eventsContent.style.opacity = "1";
+                    } else {
+                        eventsContent.innerHTML = '<p>No events available</p>';
+                        spinner.style.display = "none";
+                        eventsContent.style.opacity = "1";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading page:', error);
+                    toastr.error('Failed to load events. Please try again.');
+                    spinner.style.display = "none";
+                    eventsContent.style.opacity = "1"; // Fade back existing content
+                });
+        }
+
+        function sortTable(column, direction) {
+              const url = '@Url.Action("Index", "Events")';
+              const params = new URLSearchParams(window.location.search);
+              params.set('sortBy', column);
+              params.set('sortDirection', direction);
+              params.set('pageNumber', 1); // Reset to first page on sort
+              window.location.href = `${url}?${params.toString()}`;
+          }
+
+          document.addEventListener('DOMContentLoaded', () => {
+              const eventsContent = document.querySelector('#eventsContent');
+              eventsContent.style.opacity = "1";
+              eventsContent.style.transition = "opacity 0.3s ease";
+          });
+    </script>
+}

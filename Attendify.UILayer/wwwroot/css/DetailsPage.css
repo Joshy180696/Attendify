@@ -1,0 +1,60 @@
+﻿.rsvp-list-container {
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto; /* Scroll if too long */
+    border: 1px solid #ddd; /* Optional border */
+    border-radius: 4px;
+}
+
+.rsvp-list {
+    margin-bottom: 0; /* No extra space at bottom */
+}
+
+.list-group-item {
+    padding: 10px 15px; /* Cozy padding */
+}
+
+.response-yes {
+    color: #28a745; /* Green */
+    font-weight: 500;
+}
+
+.response-maybe {
+    color: #ffc107; /* Yellow */
+    font-weight: 500;
+}
+
+.response-no {
+    color: #dc3545; /* Red */
+    font-weight: 500;
+}
+
+.rsvp-list-container {
+    border: 1px solid #ced4da;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+    .text-center {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+        .text-center h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+    .d-flex.align-items-center.gap-3 {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+
+    .btn-outline-secondary {
+        width: 100%;
+        font-size: 1rem;
+        padding: 8px;
+    }
+}
