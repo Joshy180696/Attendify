@@ -2,8 +2,6 @@
 @using Attendify.DomainLayer.DTO
 @model PaginatedList<EventListDto>
 
-
-
 @{
     string sortBy = ViewContext.HttpContext.Request.Query["sortBy"].ToString();
     string sortDirection = ViewContext.HttpContext.Request.Query["sortDirection"].ToString();
@@ -11,65 +9,67 @@
     string rsvpSortDirection = (sortBy == "rsvpCount" && sortDirection == "asc") ? "desc" : "asc";
 }
 
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>
-                <a href="#" onclick="sortTable('date', '@dateSortDirection')" class="@(sortBy == "date" ? "text-info fw-bold" : "")">
-                    Date
-                    @if (sortBy == "date")
-                    {
-                        <i class="bi @(sortDirection == "asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-arrow-down-up"></i>
-                    }
-                </a>
-            </th>
-            <th>Can RSVP</th>
-            <th>
-                <a href="#" onclick="sortTable('rsvpCount', '@rsvpSortDirection')" class="@(sortBy == "rsvpCount" ? "text-info fw-bold" : "")">
-                    RSVP Count
-                    @if (sortBy == "rsvpCount")
-                    {
-                        <i class="bi @(sortDirection == "asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-arrow-down-up"></i>
-                    }
-                </a>
-            </th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var ev in Model)
-        {
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@ev.Title</td>
-                <td>@ev.DateTime.ToString("g")</td>
-                <td>
-                    @if (ev.DateTime > DateTime.UtcNow)
-                    {
-                        <span class="text-muted">Yes</span>
-                    }
-                    else
-                    {
-                        <span class="text-muted">No</span>
-                    }
-                </td>
-                <td><span class="badge bg-info">@ev.RSVPCount</span></td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-info btn-sm">RSVPs</a>
-                </td>
+                <th>Title</th>
+                <th>
+                    <a href="#" onclick="sortTable('date', '@dateSortDirection')" class="@(sortBy == "date" ? "text-info fw-bold" : "")">
+                        Date
+                        @if (sortBy == "date")
+                        {
+                            <i class="bi @(sortDirection == "asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-arrow-down-up"></i>
+                        }
+                    </a>
+                </th>
+                <th>Can RSVP</th>
+                <th>
+                    <a href="#" onclick="sortTable('rsvpCount', '@rsvpSortDirection')" class="@(sortBy == "rsvpCount" ? "text-info fw-bold" : "")">
+                        RSVP Count
+                        @if (sortBy == "rsvpCount")
+                        {
+                            <i class="bi @(sortDirection == "asc" ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-arrow-down-up"></i>
+                        }
+                    </a>
+                </th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var ev in Model)
+            {
+                <tr>
+                    <td>@ev.Title</td>
+                    <td>@ev.DateTime.ToString("g")</td>
+                    <td>
+                        @if (ev.DateTime > DateTime.UtcNow)
+                        {
+                            <span class="text-muted">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No</span>
+                        }
+                    </td>
+                    <td><span class="badge bg-info">@ev.RSVPCount</span></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-info btn-sm">RSVPs</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
 
 <div class="paginator" aria-label="Page navigation">
     <div class="pagination-container" style="display:flex; justify-content:center;">
@@ -96,19 +96,3 @@
         </ul>
     </div>
 </div>
-
-                    <style>
-    th a {
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-        color: inherit;
-    }
-
-        th a i {
-            margin-left: 5px;
-            font-size: 0.9rem;
-        }
-
-
-                    </style>

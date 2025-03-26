@@ -50,3 +50,14 @@
         font-size: 0.9rem;
     }
 }
+th a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+    th a i {
+        margin-left: 5px;
+        font-size: 0.9rem;
+    }

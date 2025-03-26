@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
+    <link rel="shortcut icon" type="image/x-icon"  href="~/faviconapp.ico">
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -25,25 +26,26 @@
         <nav class="nav">
             <div class="navbar">
                 <i class='bx bx-menu'></i>
-                <div class="logo"><a href="#">Attendify</a></div>
+                <div class="logo">
+                    <a href="#">Attendify</a>
+                </div>
                 <div class="nav-links">
                     <div class="sidebar-logo">
                         <span class="logo-name">Attendify</span>
                         <i class='bx bx-x'></i>
                     </div>
                     <ul class="links">
-                        <li><a asp-action="Index" asp-controller="Home">HOME</a></li>
-                        <li><a asp-action="Index" asp-controller="Events">EVENTS</a></li>
+                        <li><a asp-action="Index" asp-controller="Home"><i class="fa-solid fa-home"></i> HOME</a></li>
+                        <li><a asp-action="Index" asp-controller="Events"><i class="fa-solid fa-calendar-days"></i> EVENTS</a></li>
                         <li>
-                            <a href="#">CONTACT</a>
-                            <i class='bx bxs-chevron-down htmlcss-arrow arrow  '></i>
+                            <a href="#"><i class="fa-solid fa-phone"></i> CONTACT</a>
+                            <i class='bx bxs-chevron-down htmlcss-arrow arrow'></i>
                             <ul class="htmlCss-sub-menu sub-menu">
                                 <li><a href="https://github.com/Joshy180696" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a></li>
                                 <li><a href="https://www.linkedin.com/in/jo%C3%A3o-fernandes-746ab922a/" target="_blank"><i class="fa-brands fa-linkedin"></i> LinkedIn</a></li>
                             </ul>
-                        </li>                  
-                        <li><a href="#">ABOUT</a></li>
-                      
+                        </li>
+                        <li><a href="#"><i class="fa-solid fa-circle-info"></i> ABOUT</a></li>
                     </ul>
                 </div>
                 <div class="search-box">
