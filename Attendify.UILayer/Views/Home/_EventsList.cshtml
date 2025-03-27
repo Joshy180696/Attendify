@@ -9,7 +9,7 @@
         <div class="event-card">
             <div class="text-center">
                 <h3>@ev.Title</h3>
-                <p class="date">@ev.DateTime.ToString("MMMM d, yyyy - HH:mm", System.Globalization.CultureInfo.InvariantCulture)</p>
+                <p class="date">@ev.DateTime.ToString("dd/MM/yyyy - HH:mm", System.Globalization.CultureInfo.InvariantCulture)</p>
                 <p class="location"><strong>Location:</strong> @ev.Location</p>
                 <p class="creator"><strong>By:</strong> @ev.CreatedBy</p>
                 <p>@ev.Description</p>
