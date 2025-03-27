@@ -29,6 +29,7 @@ h2.text-info {
 .text-info {
     color: #17a2b8 !important; /* Teal color for headings and links */
 }
+
 @media (max-width: 768px) {
     .text-center {
         flex-direction: column;
