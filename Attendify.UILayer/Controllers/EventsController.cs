@@ -26,8 +26,6 @@ namespace Attendify.UILayer.Controllers
         {
             var events = await _eventService.GetAllPaginatedEventsAsync(pageNumber ?? 1, 10, string.Empty, null, null, null, true, sortBy, sortDirection);
 
-
-
             return View(events);
         }
 

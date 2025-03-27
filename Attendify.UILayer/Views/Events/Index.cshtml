@@ -48,9 +48,6 @@
             const pageSize = document.getElementById('pageSize').value;
 
             const params = new URLSearchParams(fullUrl.search);
-            params.set('year', null);
-            params.set('month', null);
-            params.set('day', null);
             params.set('pageSize', pageSize);
             params.set('showAll', true);
 
@@ -80,6 +77,9 @@
                         eventsContent.innerHTML = data.html; // Render partial HTML
                         spinner.style.display = "none";
                         eventsContent.style.opacity = "1";
+                        // Update the URL without reloading the page
+                        const newUrl = '@Url.Action("Index", "Events")' + `?${params.toString()}`;
+                        window.history.pushState({}, '', newUrl);
                     } else {
                         eventsContent.innerHTML = '<p>No events available</p>';
                         spinner.style.display = "none";
@@ -95,18 +95,58 @@
         }
 
         function sortTable(column, direction) {
-              const url = '@Url.Action("Index", "Events")';
-              const params = new URLSearchParams(window.location.search);
-              params.set('sortBy', column);
-              params.set('sortDirection', direction);
-              params.set('pageNumber', 1); // Reset to first page on sort
-              window.location.href = `${url}?${params.toString()}`;
-          }
+            const url = '@Url.Action("LoadEvents", "Events")';
+            const pageSize = document.getElementById('pageSize').value;
+            const params = new URLSearchParams(window.location.search);
 
-          document.addEventListener('DOMContentLoaded', () => {
-              const eventsContent = document.querySelector('#eventsContent');
-              eventsContent.style.opacity = "1";
-              eventsContent.style.transition = "opacity 0.3s ease";
-          });
+            // Set sorting parameters
+            params.set('sortBy', column);
+            params.set('sortDirection', direction);
+            params.set('pageNumber', 1); // Reset to first page on sort
+            params.set('pageSize', pageSize);
+            params.set('showAll', true);
+
+            const spinner = document.querySelector('#loadingSpinner');
+            const eventsContent = document.querySelector('#eventsContent');
+
+            // Show spinner, fade out content
+            spinner.style.display = "block";
+            eventsContent.style.opacity = "0";
+            eventsContent.style.transition = "opacity 0.3s ease";
+
+            fetch(`${url}?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Expect JSON from controller
+                })
+                .then(data => {
+                    if (data.html) {
+                        eventsContent.innerHTML = data.html; // Render partial HTML
+                        spinner.style.display = "none";
+                        eventsContent.style.opacity = "1";
+                        // Update the URL without reloading the page
+                        const newUrl = '@Url.Action("Index", "Events")' + `?${params.toString()}`;
+                        window.history.pushState({}, '', newUrl);
+                    } else {
+                        eventsContent.innerHTML = '<p>No events available</p>';
+                        spinner.style.display = "none";
+                        eventsContent.style.opacity = "1";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sorting events:', error);
+                    toastr.error('Failed to sort events. Please try again.');
+                    spinner.style.display = "none";
+                    eventsContent.style.opacity = "1"; // Fade back existing content
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const eventsContent = document.querySelector('#eventsContent');
+            eventsContent.style.opacity = "1";
+            eventsContent.style.transition = "opacity 0.3s ease";
+        });
     </script>
 }
