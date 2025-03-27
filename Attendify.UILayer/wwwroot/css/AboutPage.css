@@ -29,3 +29,47 @@ h2.text-info {
 .text-info {
     color: #17a2b8 !important; /* Teal color for headings and links */
 }
+@media (max-width: 768px) {
+    .text-center {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+        .text-center h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+    .d-flex.align-items-center.gap-3 {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .date-picker input {
+        width: 100%;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .btn-outline-secondary {
+        width: 100%;
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    .event-container {
+        text-align: center;
+    }
+
+    .event-card.empty-state {
+        padding: 15px;
+        font-size: 0.95rem;
+    }
+
+        .event-card.empty-state .btn-primary {
+            width: 100%;
+            margin-top: 10px;
+        }
+}

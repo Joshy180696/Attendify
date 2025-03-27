@@ -27,12 +27,12 @@
             <input type="date" id="eventDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="loadEventsByDate()" />
          
         </div>
-        <button type="button" id="refreshEvents" class="btn btn-secondary btn-sm" title="Refresh Events" onclick="refresh()">
+        <button type="button" id="refreshEvents" class="btn btn-outline-secondary" title="Refresh Events" onclick="refresh()">
             Clear Filters
         </button>
    
         
-            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+            <button class="btn btn-info" style="color:white" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
         
      
     </div>
@@ -48,7 +48,7 @@
             <div class="event-card empty-state">
                 <h3>No Events Today</h3>
                 <p class="date">Looks like it’s a quiet day!</p>
-                <p>Why not kick things off? <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+                <p>Why not kick things off? <button class="btn btn-info" style="color:white" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
             </div>
         </div>
     }
@@ -97,8 +97,8 @@
                 </form>
             </div>
             <div class="modal-footer" style="justify-content:center;">
-                
-                    <button type="button" class="btn btn-info btn-sm" onclick="submitCreateEvent()">Create</button>
+
+                <button type="button" class="btn btn-info" style="color:white" onclick="submitCreateEvent()">Create</button>
             </div>
         </div>
     </div>
@@ -134,8 +134,8 @@
                 </form>
             </div>
             <div class="modal-footer" style="justify-content:center;">
-                
-                    <button type="button" class="btn btn-info btn-sm" onclick="submitRSVPFromModal()">Submit RSVP</button>    
+
+                <button type="button" class="btn btn-info" style="color:white" onclick="submitRSVPFromModal()">Submit RSVP</button>
             </div>
         </div>
     </div>
@@ -231,16 +231,6 @@
                                 if (!data.searchString) {
                                     document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
                                 }
-                                        // Render the "No Events" message in the container
-                                container.innerHTML = `
-                                    <div class="event-container">
-                                        <div class="event-card empty-state">
-                                            <h3>No Events Today</h3>
-                                            <p class="date">Looks like it’s a quiet day!</p>
-                                            <p>Why not kick things off? <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
-                                        </div>
-                                    </div>
-                                `;
                             } else if (container) {
                                 container.innerHTML = data.html;
                             }

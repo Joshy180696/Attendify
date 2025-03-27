@@ -16,10 +16,7 @@
 <hr />
 
 
-<style>
 
-
-</style>
 
 <!-- Delete event modal confirmation -->
 <div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
@@ -31,12 +28,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete the event "<span id="deleteEventTitle"></span>"? This action cannot be undone, and all associated RSVPs will also be deleted.</p>
+                <p>Are you sure you want to delete the event "<b><span id="deleteEventTitle"></span></b>"? This action cannot be undone, and all associated RSVPs will also be deleted.</p>
                 <input type="hidden" id="deleteEventId" />
             </div>
             <div class="modal-footer" style="justify-content: center;">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDeleteEvent()">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteEvent()">Delete</button>
             </div>
         </div>
     </div>
@@ -54,7 +51,7 @@
     <div id="eventsContent">
         @if (!Model.Any())
         {
-            <p>No events available. <a asp-controller="Home" asp-action="Index" class="btn btn-info btn-sm">Create one now!</a></p>
+            <p>No events available. <a asp-controller="Home" asp-action="Index" class="btn btn-info" style="color:white">Create one now!</a></p>
         }
         else
         {
