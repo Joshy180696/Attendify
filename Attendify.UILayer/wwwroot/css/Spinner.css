@@ -1,7 +1,15 @@
 ﻿#loadingSpinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed; /* Fix the spinner in the viewport */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for the spinner's own dimensions */
+    z-index: 1000; /* Ensure it appears above other content */
+}
 
+/* Optional: Style the spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-color: #00c4cc; /* Brighter teal for the spinner border */
+    border-right-color: transparent; /* Required for the spinner animation */
 }
