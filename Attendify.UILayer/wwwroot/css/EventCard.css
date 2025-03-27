@@ -13,6 +13,10 @@
     padding: 20px;
     width: 300px;
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 400px; /* Ensures all cards have the same height */
 }
 
     .event-card:hover {
@@ -30,18 +34,54 @@
         font-style: italic;
     }
 
-    .event-card .location, .event-card .creator {
+    .event-card .location,
+    .event-card .creator {
         margin: 5px 0;
     }
 
-    .event-card p {
-        color: #555;
+    /* Scrollable description */
+    .event-card .description {
+        max-height: 100px; /* Adjust this value as needed */
+        overflow-y: auto;
+        padding-right: 5px; /* Prevent text from being hidden under scrollbar */
     }
 
+        /* Custom scrollbar for description */
+        .event-card .description::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .event-card .description::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+    .event-card p {
+        color: #555;
+        margin: 5px 0;
+    }
+
+    /* RSVP and status area at the bottom */
+    .event-card .event-footer {
+        margin-top: auto;
+        text-align: center;
+    }
+
+        .event-card .event-footer .badge {
+            /*display: block;*/
+            margin-bottom: 10px;
+        }
+
+        .event-card .event-footer .text-muted {
+            color: #fb0a21 !important;
+        }
+
+/* Empty state styling */
 .empty-state {
     background: #f8f9fa; /* Light gray to stand out */
-    border: 2px dashed #ccc; /* Dashed border for a "placeholder" vibe */
+    border: 2px dashed #ccc; /* Dashed border for a "placeholder" look */
     text-align: center;
+    padding: 20px;
 }
 
     .empty-state h3 {

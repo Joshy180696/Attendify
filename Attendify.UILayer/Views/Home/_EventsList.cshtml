@@ -3,7 +3,6 @@
 @model PaginatedList<EventListDto>
 
 <div class="event-container">
-
     @foreach (var ev in Model)
     {
         <div class="event-card">
@@ -12,7 +11,10 @@
                 <p class="date">@ev.DateTime.ToString("dd/MM/yyyy - HH:mm", System.Globalization.CultureInfo.InvariantCulture)</p>
                 <p class="location"><strong>Location:</strong> @ev.Location</p>
                 <p class="creator"><strong>By:</strong> @ev.CreatedBy</p>
-                <p>@ev.Description</p>
+                <p class="description">@ev.Description</p>
+            </div>
+
+            <div class="event-footer">
                 <p><span class="badge bg-info">@ev.RSVPCount RSVP@(ev.RSVPCount == 1 ? "" : "s")</span></p>
                 @if (ev.DateTime > DateTime.UtcNow)
                 {
@@ -20,11 +22,9 @@
                 }
                 else
                 {
-                    <span class="text-muted">Event has passed</span>
+                    <span class="text-muted">Event has passed!</span>
                 }
             </div>
-    
-       
         </div>
     }
 </div>
