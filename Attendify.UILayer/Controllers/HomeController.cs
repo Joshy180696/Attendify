@@ -55,7 +55,7 @@ namespace Attendify.UILayer.Controllers
 
             var renderHtml = await _viewRenderService.RenderViewToStringAsync("_EventsList", events, ControllerContext);
 
-            return Json(new { html = renderHtml, pageNumber = model.pageNumber, isEmpty });
+            return Json(new { html = renderHtml, pageNumber = model.pageNumber, isEmpty, searchString = model.searchString });
         }
 
         /// <summary>

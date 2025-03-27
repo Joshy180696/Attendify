@@ -40,8 +40,11 @@ namespace Attendify.DomainLayer.Classes
             // Apply search filter
             if (!string.IsNullOrEmpty(searchString))
             {
-                eventsQuery = eventsQuery.Where(e => e.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
-                                                     e.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+                searchString = $"%{searchString}%"; // Add wildcards for LIKE
+                eventsQuery = eventsQuery.Where(e =>
+                    EF.Functions.Like(e.Title, searchString) ||
+                    EF.Functions.Like(e.Location, searchString) ||
+                    (e.Description != null && EF.Functions.Like(e.Description, searchString)));
             }
 
             if (!string.IsNullOrEmpty(sortBy))

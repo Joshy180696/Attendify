@@ -45,13 +45,19 @@
                                 <li><a href="https://www.linkedin.com/in/jo%C3%A3o-fernandes-746ab922a/" target="_blank"><i class="fa-brands fa-linkedin"></i> LinkedIn</a></li>
                             </ul>
                         </li>
-                        <li><a href="#"><i class="fa-solid fa-circle-info"></i> ABOUT</a></li>
+                        <li><a asp-action="Index" asp-controller="About">ABOUT</a></li>
                     </ul>
                 </div>
+                @{
+                    bool isHomeController = ViewContext.RouteData.Values["controller"]?.ToString() == "Home";
+                }
                 <div class="search-box">
                     <i class='bx bx-search'></i>
                     <div class="input-box">
-                        <input type="text" placeholder="Search Event...">
+                        <div class="d-flex align-items-center">
+                            <input type="text" id="searchString" placeholder="Search Event..." class="form-control me-2" @(isHomeController ? "" : "disabled")>
+                         
+                        </div>
                     </div>
                 </div>
             </div>

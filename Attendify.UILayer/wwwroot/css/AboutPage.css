@@ -1,0 +1,31 @@
+﻿/* About Page Styling */
+.container.mt-5 {
+    max-width: 800px; /* Keep the content centered and not too wide */
+}
+
+h1.display-4 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+h2.text-info {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.75rem 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+    .list-group-item ul {
+        margin-top: 0.5rem;
+        padding-left: 1.5rem;
+    }
+
+.text-info {
+    color: #17a2b8 !important; /* Teal color for headings and links */
+}
