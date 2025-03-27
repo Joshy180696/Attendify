@@ -155,8 +155,7 @@
             "toastClass": "toast-custom"
         };
 
-        // Pagination
-        function loadPage(event, link) {
+             function loadPage(event, link) {
             event.preventDefault();
             const relativeUrl = link.getAttribute('href');
             const baseUrl = window.location.origin;
@@ -189,6 +188,44 @@
                         const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
                         toastr.info(`No events for ${selectedDate}`);
                         document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+                        // Update the container to show the "No Events Today" message for the reset date (today)
+                        const todayYear = '@DateTime.Today.Year';
+                        const todayMonth = '@DateTime.Today.Month'.padStart(2, '0');
+                        const todayDay = '@DateTime.Today.Day'.padStart(2, '0');
+                        const newParams = new URLSearchParams({
+                            year: todayYear,
+                            month: todayMonth,
+                            day: todayDay,
+                            pageNumber: 1,
+                            pageSize: pageSize,
+                            searchString: document.getElementById('searchString').value
+                        });
+                        fetch(`${fullUrl.pathname}?${newParams.toString()}`)
+                            .then(response => response.json())
+                            .then(todayData => {
+                                if (todayData.isEmpty) {
+                                    eventsContainer.innerHTML = `
+                                        <div class="event-container">
+                                            <div class="event-card empty-state">
+                                                <h3>No Events Today</h3>
+                                                <p class="date">Looks like it’s a quiet day!</p>
+                                                <p>Why not kick things off? <button class="btn btn-info" style="color:white" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+                                            </div>
+                                        </div>`;
+                                } else {
+                                    eventsContainer.innerHTML = todayData.html;
+                                }
+                                // Re-add the spinner div
+                                const spinnerDiv = document.createElement('div');
+                                spinnerDiv.id = 'loadingSpinner';
+                                spinnerDiv.style.display = 'none';
+                                spinnerDiv.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                                eventsContainer.prepend(spinnerDiv);
+                            })
+                            .catch(error => {
+                                console.error('Error loading today\'s events:', error);
+                                toastr.error('Failed to load today\'s events. Please try again.');
+                            });
                     } else if (eventsContainer) {
                         eventsContainer.innerHTML = data.html;
                         // Re-add the spinner div after updating the container
@@ -215,7 +252,7 @@
             loadEventsByDate();
         }
 
-        function loadEventsByDate() {
+                 function loadEventsByDate() {
             const dateInput = document.getElementById('eventDate').value;
             const [year, month, day] = dateInput.split('-');
             const pageSize = document.getElementById('pageSize').value;
@@ -247,12 +284,51 @@
                     if (data.isEmpty) {
                         const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
                         if (data.searchString) {
+                            // If there's a search string and no matches, just show the toastr message
+                            // Do not update the eventsContainer, so existing events remain visible
                             toastr.info(`No events found matching "${data.searchString}" for ${selectedDate}`);
                         } else {
+                            // If there's no search string and no events, show the "No Events" message
                             toastr.info(`No events for ${selectedDate}`);
-                        }
-                        if (!data.searchString) {
                             document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+                            // Update the container to show the "No Events Today" message for the reset date (today)
+                            const todayYear = '@DateTime.Today.Year';
+                            const todayMonth = '@DateTime.Today.Month'.padStart(2, '0');
+                            const todayDay = '@DateTime.Today.Day'.padStart(2, '0');
+                            const newParams = new URLSearchParams({
+                                year: todayYear,
+                                month: todayMonth,
+                                day: todayDay,
+                                pageNumber: 1,
+                                pageSize: pageSize,
+                                searchString: document.getElementById('searchString').value
+                            });
+                            fetch(`${url}?${newParams.toString()}`)
+                                .then(response => response.json())
+                                .then(todayData => {
+                                    if (todayData.isEmpty) {
+                                        eventsContainer.innerHTML = `
+                                            <div class="event-container">
+                                                <div class="event-card empty-state">
+                                                    <h3>No Events Today</h3>
+                                                    <p class="date">Looks like it’s a quiet day!</p>
+                                                    <p>Why not kick things off? <button class="btn btn-info" style="color:white" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+                                                </div>
+                                            </div>`;
+                                    } else {
+                                        eventsContainer.innerHTML = todayData.html;
+                                    }
+                                    // Re-add the spinner div
+                                    const spinnerDiv = document.createElement('div');
+                                    spinnerDiv.id = 'loadingSpinner';
+                                    spinnerDiv.style.display = 'none';
+                                    spinnerDiv.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                                    eventsContainer.prepend(spinnerDiv);
+                                })
+                                .catch(error => {
+                                    console.error('Error loading today\'s events:', error);
+                                    toastr.error('Failed to load today\'s events. Please try again.');
+                                });
                         }
                     } else if (eventsContainer) {
                         eventsContainer.innerHTML = data.html;
