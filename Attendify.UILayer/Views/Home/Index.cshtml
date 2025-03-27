@@ -11,6 +11,14 @@
     <link href="~/css/HomePage.css" rel="stylesheet" />
 }
 
+
+
+
+
+
+
+
+
 <!-- Title and Date picker plus create btn -->
 <div class="text-center d-flex justify-content-between align-items-center mb-4">
     <h2 class="display-4">Welcome</h2>
@@ -22,26 +30,33 @@
         <button type="button" id="refreshEvents" class="btn btn-secondary btn-sm" title="Refresh Events" onclick="refresh()">
             Clear Filters
         </button>
-        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+   
+        
+            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+        
+     
     </div>
 </div>
 <hr />
 
 <!-- Partial container -->
-@if (!Model.Any())
-{
-    <div class="event-container">
-        <div class="event-card empty-state">
-            <h3>No Events Today</h3>
-            <p class="date">Looks like it’s a quiet day!</p>
-            <p>Why not kick things off? <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+<!-- Always render the events container -->
+<div class="container my-5" id="eventsContainer">
+    @if (!Model.Any())
+    {
+        <div class="event-container">
+            <div class="event-card empty-state">
+                <h3>No Events Today</h3>
+                <p class="date">Looks like it’s a quiet day!</p>
+                <p>Why not kick things off? <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+            </div>
         </div>
-    </div>
-}else{
-    <div class="container my-5" id="eventsContainer">
+    }
+    else
+    {
         @await Html.PartialAsync("_EventsList", Model)
-    </div>
-}
+    }
+</div>
 
 <!-- Create Event Modal -->
 <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
@@ -216,6 +231,16 @@
                                 if (!data.searchString) {
                                     document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
                                 }
+                                        // Render the "No Events" message in the container
+                                container.innerHTML = `
+                                    <div class="event-container">
+                                        <div class="event-card empty-state">
+                                            <h3>No Events Today</h3>
+                                            <p class="date">Looks like it’s a quiet day!</p>
+                                            <p>Why not kick things off? <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+                                        </div>
+                                    </div>
+                                `;
                             } else if (container) {
                                 container.innerHTML = data.html;
                             }

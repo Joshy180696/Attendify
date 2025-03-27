@@ -1,4 +1,123 @@
-﻿@media (max-width: 768px) {
+﻿/* General table styles */
+#eventsTableContainer {
+    position: relative;
+    min-height: 200px; /* Avoid collapse during load */
+}
+
+.table thead {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f9ff; /* Light teal-ish */
+    transition: background-color 0.2s ease;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Sorting link styles */
+th a {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+    th a i {
+        margin-left: 5px;
+        font-size: 0.9rem;
+    }
+
+/* Set a minimum width for the table on desktop */
+.table {
+    min-width: 600px; /* Ensures the table doesn't get too cramped on larger screens */
+}
+
+    /* Allow text to wrap in columns to prevent overflow */
+    .table th, .table td {
+        vertical-align: middle;
+        white-space: normal; /* Allow text to wrap */
+        word-wrap: break-word; /* Ensure long words break */
+        padding: 0.5rem; /* Reduced from Bootstrap's default 0.75rem */
+    }
+
+        /* Desktop column widths */
+        .table th:nth-child(1), .table td:nth-child(1) { /* Title */
+            width: 28%; /* Reduced from 30% */
+        }
+
+        .table th:nth-child(2), .table td:nth-child(2) { /* Date */
+            width: 23%; /* Reduced from 25% */
+        }
+
+        .table th:nth-child(3), .table td:nth-child(3) { /* Can RSVP */
+            width: 14%; /* Reduced from 15% */
+        }
+
+        .table th:nth-child(4), .table td:nth-child(4) { /* RSVP Count */
+            width: 14%; /* Reduced from 15% */
+        }
+
+        .table th:nth-child(5), .table td:nth-child(5) { /* Actions */
+            width: 14%; /* Reduced from 15% */
+        }
+
+/* Ensure buttons are tappable */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Ensure the dropdown button is compact */
+.dropdown-toggle.btn-sm {
+    padding: 0.25rem 0.4rem; /* Slightly reduce padding */
+}
+
+.dropdown-menu {
+    min-width: 120px;
+}
+
+.dropdown-item {
+    font-size: 0.875rem;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 576px) {
+    /* Remove the min-width on mobile to prevent horizontal scrolling */
+    .table {
+        min-width: 0; /* Allow the table to shrink to fit the viewport */
+    }
+
+        /* Hide Date, Can RSVP, and RSVP Count columns on mobile */
+        .table th:nth-child(2), .table td:nth-child(2), /* Date */
+        .table th:nth-child(3), .table td:nth-child(3), /* Can RSVP */
+        .table th:nth-child(4), .table td:nth-child(4) { /* RSVP Count */
+            display: none;
+        }
+
+        /* Adjust widths for the remaining columns */
+        .table th:nth-child(1), .table td:nth-child(1) { /* Title */
+            width: 70%; /* Increased to take up more space */
+        }
+
+        .table th:nth-child(5), .table td:nth-child(5) { /* Actions */
+            width: 30%; /* Adjusted to fit alongside the Title */
+        }
+
+    /* Ensure buttons are tappable on mobile */
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* General mobile adjustments */
+@media (max-width: 768px) {
     .text-center {
         flex-direction: column;
         align-items: center;
@@ -16,48 +135,16 @@
         width: 100%;
     }
 
-
     .btn-outline-secondary {
         width: 100%;
         font-size: 1rem;
         padding: 8px;
     }
-
-
-}
-#eventsTableContainer {
-    position: relative;
-    min-height: 200px; /* Avoid collapse during load */
 }
 
-.table thead {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    z-index: 1;
-}
-
-.table tbody tr:hover {
-    background-color: #f1f9ff; /* Light teal-ish */
-    transition: background-color 0.2s ease;
-}
-.table-responsive {
-    overflow-x: auto;
-}
-@media (max-width: 576px) {
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 0.9rem;
+/* Disable horizontal scrolling on desktop */
+@media (min-width: 577px) {
+    .table-responsive {
+        overflow-x: visible; /* No scrollbar on desktop */
     }
 }
-th a {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-}
-
-    th a i {
-        margin-left: 5px;
-        font-size: 0.9rem;
-    }
