@@ -4,19 +4,18 @@
 @{
     ViewData["Title"] = "Events";
 }
+
 @section Styles {
     <link href="~/css/EventsPage.css" rel="stylesheet" />
     <link href="~/css/Paginator.css" rel="stylesheet" />
     <link href="~/css/Spinner.css" rel="stylesheet" />
+
 }
 
 <div class="text-center d-flex justify-content-between align-items-center mb-4">
     <h2 class="display-4">Events History</h2>
 </div>
 <hr />
-
-
-
 
 <!-- Delete event modal confirmation -->
 <div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
@@ -33,7 +32,12 @@
             </div>
             <div class="modal-footer" style="justify-content: center;">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="confirmDeleteEvent()">Delete</button>
+                <button type="button" class="btn btn-danger" id="deleteEventButton" onclick="confirmDeleteEvent()">
+                    <span id="deleteButtonText">Delete</span>
+                    <span id="deleteSpinner" class="spinner-border spinner-border-sm" role="status" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -177,24 +181,30 @@
             const modal = new bootstrap.Modal(document.getElementById('deleteEventModal'));
             modal.show();
         }
+
         // Confirm the delete action
         function confirmDeleteEvent() {
             const id = document.getElementById('deleteEventId').value;
-            console.log(id)
+            const deleteButton = document.getElementById('deleteEventButton');
+            const buttonText = document.getElementById('deleteButtonText');
+            const spinner = document.getElementById('deleteSpinner');
+
             if (!id || id === "0") {
                 toastr.error('No event selected for deletion.');
                 return;
             }
 
+            // Show spinner, hide button text, disable button
+            buttonText.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            deleteButton.disabled = true;
 
-
-           fetch(`@Url.Action("Delete", "Events")/${id}`, {
+            fetch(`@Url.Action("Delete", "Events")/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                },
-         
+                }
             })
             .then(response => {
                 if (!response.ok) {
@@ -207,12 +217,10 @@
                     toastr.success(data.message || 'Event deleted successfully!');
                     bootstrap.Modal.getInstance(document.getElementById('deleteEventModal')).hide();
                     // Refresh the events table
-                    // Get the current sort parameters from the URL
                     const params = new URLSearchParams(window.location.search);
-                    const sortBy = params.get('sortBy') || 'date'; // Default to 'date' if not set
-                    const sortDirection = params.get('sortDirection') || 'asc'; // Default to 'asc' if not set
-
-                    sortTable(sortBy, sortDirection); // Or use the current sort parameters to preserve them
+                    const sortBy = params.get('sortBy') || 'date';
+                    const sortDirection = params.get('sortDirection') || 'asc';
+                    sortTable(sortBy, sortDirection);
                 } else {
                     toastr.error(data.message || 'Failed to delete event.');
                 }
@@ -220,9 +228,14 @@
             .catch(error => {
                 console.error('Error deleting event:', error);
                 toastr.error(error.message || 'Failed to delete event.');
+            })
+            .finally(() => {
+                // Hide spinner, show button text, re-enable button
+                buttonText.style.display = 'inline';
+                spinner.style.display = 'none';
+                deleteButton.disabled = false;
             });
         }
-
 
         document.addEventListener('DOMContentLoaded', () => {
             const eventsContent = document.querySelector('#eventsContent');

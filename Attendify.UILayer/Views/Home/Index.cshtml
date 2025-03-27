@@ -5,19 +5,14 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+
 @section Styles {
     <link href="~/css/Paginator.css" rel="stylesheet" />
     <link href="~/css/EventCard.css" rel="stylesheet" />
     <link href="~/css/HomePage.css" rel="stylesheet" />
+    <link href="~/css/Spinner.css" rel="stylesheet" />
+ 
 }
-
-
-
-
-
-
-
-
 
 <!-- Title and Date picker plus create btn -->
 <div class="text-center d-flex justify-content-between align-items-center mb-4">
@@ -25,16 +20,11 @@
     <div class="d-flex align-items-center gap-3">
         <div class="date-picker d-flex align-items-center gap-2">
             <input type="date" id="eventDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="loadEventsByDate()" />
-         
         </div>
         <button type="button" id="refreshEvents" class="btn btn-outline-secondary" title="Refresh Events" onclick="refresh()">
             Clear Filters
         </button>
-   
-        
-            <button class="btn btn-info" style="color:white" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
-        
-     
+        <button class="btn btn-info" style="color:white" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
     </div>
 </div>
 <hr />
@@ -42,6 +32,11 @@
 <!-- Partial container -->
 <!-- Always render the events container -->
 <div class="container my-5" id="eventsContainer">
+    <div id="loadingSpinner" style="display: none;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     @if (!Model.Any())
     {
         <div class="event-container">
@@ -76,7 +71,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" maxlength="500" pattern="^[a-zA-Z0-9\s\-\.\,\!\?'" \(\)]+$"></textarea>
+                        <textarea class="form-control" id="description" maxlength="500" pattern="^[a-zA-Z0-9\s\-\.\,\!\?\'\" \(\)]+$"></textarea>
                         <div class="invalid-feedback" id="description-error"></div>
                     </div>
                     <div class="mb-3">
@@ -91,14 +86,18 @@
                     </div>
                     <div class="mb-3">
                         <label for="createdBy" class="form-label">Your Name</label>
-                        <input type="text" class="form-control" id="createdBy" required maxlength="50" minlength="2" pattern="^[a-zA-Z\s-']+$" />
+                        <input type="text" class="form-control" id="createdBy" required maxlength="50" minlength="2" pattern="^[a-zA-Z\s-\']+$" />
                         <div class="invalid-feedback" id="createdBy-error"></div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer" style="justify-content:center;">
-
-                <button type="button" class="btn btn-info" style="color:white" onclick="submitCreateEvent()">Create</button>
+                <button type="button" class="btn btn-info" style="color:white" id="createEventButton" onclick="submitCreateEvent()">
+                    <span id="createButtonText">Create</span>
+                    <span id="createSpinner" class="spinner-border spinner-border-sm" role="status" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -115,10 +114,9 @@
             <div class="modal-body">
                 <form id="rsvpForm">
                     @Html.AntiForgeryToken()
-                  
                     <div class="mb-3">
                         <label for="rsvpUserName" class="form-label">Your Name</label>
-                        <input type="text" class="form-control" id="rsvpUserName" required>
+                        <input type="text" class="form-control" id="rsvpUserName" required maxlength="50" minlength="2" pattern="^[a-zA-Z\s-\']+$" />
                         <div class="invalid-feedback" id="rsvpUserName-error"></div>
                     </div>
                     <div class="mb-3">
@@ -134,72 +132,90 @@
                 </form>
             </div>
             <div class="modal-footer" style="justify-content:center;">
-
-                <button type="button" class="btn btn-info" style="color:white" onclick="submitRSVPFromModal()">Submit RSVP</button>
+                <button type="button" class="btn btn-info" style="color:white" id="rsvpButton" onclick="submitRSVPFromModal()">
+                    <span id="rsvpButtonText">Submit RSVP</span>
+                    <span id="rsvpSpinner" class="spinner-border spinner-border-sm" role="status" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-
-<input type="hidden" id="pageSize" value="5" /> 
+<input type="hidden" id="pageSize" value="5" />
 
 @section Scripts {
     <script>
-//-------------------------------------------------------------------------------------------------------------------------------- toastr 
+        // Toastr configuration
         toastr.options = {
-               positionClass: "toast-top-right",
-               timeOut: 3000,
-               progressBar: true,
-               "toastClass": "toast-custom" 
+            positionClass: "toast-top-right",
+            timeOut: 3000,
+            progressBar: true,
+            "toastClass": "toast-custom"
         };
-//-------------------------------------------------------------------------------------------------------------------------------- Pagination
-        function loadPage(event, link) {
-              event.preventDefault();
-              const relativeUrl = link.getAttribute('href');
-              const baseUrl = window.location.origin;
-              const fullUrl = new URL(relativeUrl, baseUrl);
-              const dateInput = document.getElementById('eventDate').value;
-              const [year, month, day] = dateInput.split('-');
-              const pageSize = document.getElementById('pageSize').value;
-              const params = new URLSearchParams(fullUrl.search);
-              params.set('year', year);
-              params.set('month', month);
-              params.set('day', day);
-              params.set('pageSize', pageSize);
 
-              fetch(`${fullUrl.pathname}?${params.toString()}`)
-               .then(response => {
-                      if (!response.ok) {
-                          throw new Error('Network response was not ok');
-                      }
-                      return response.json();
-               })
-               .then(data => {
-                      const container = document.querySelector('#eventsContainer');
-                      if (data.isEmpty) {
-                          const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
-                          toastr.info(`No events for ${selectedDate}`);
-          
-                          document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
-                      } else if (container) {
-                          container.innerHTML = data.html;
-                      }
+        // Pagination
+        function loadPage(event, link) {
+            event.preventDefault();
+            const relativeUrl = link.getAttribute('href');
+            const baseUrl = window.location.origin;
+            const fullUrl = new URL(relativeUrl, baseUrl);
+            const dateInput = document.getElementById('eventDate').value;
+            const [year, month, day] = dateInput.split('-');
+            const pageSize = document.getElementById('pageSize').value;
+            const params = new URLSearchParams(fullUrl.search);
+            params.set('year', year);
+            params.set('month', month);
+            params.set('day', day);
+            params.set('pageSize', pageSize);
+
+            const spinner = document.querySelector('#loadingSpinner');
+            const eventsContainer = document.querySelector('#eventsContainer');
+
+            // Show spinner, fade out content
+            spinner.style.display = "block";
+            eventsContainer.style.opacity = "0";
+
+            fetch(`${fullUrl.pathname}?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.isEmpty) {
+                        const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
+                        toastr.info(`No events for ${selectedDate}`);
+                        document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+                    } else if (eventsContainer) {
+                        eventsContainer.innerHTML = data.html;
+                        // Re-add the spinner div after updating the container
+                        const spinnerDiv = document.createElement('div');
+                        spinnerDiv.id = 'loadingSpinner';
+                        spinnerDiv.style.display = 'none';
+                        spinnerDiv.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                        eventsContainer.prepend(spinnerDiv);
+                    }
+                    spinner.style.display = "none";
+                    eventsContainer.style.opacity = "1";
                 })
                 .catch(error => {
-                      console.error('Error loading page:', error);
-                      toastr.error('Failed to load events. Please try again.');
+                    console.error('Error loading page:', error);
+                    toastr.error('Failed to load events. Please try again.');
+                    spinner.style.display = "none";
+                    eventsContainer.style.opacity = "1";
                 });
-          }
-//---------------------------------------------------------------------------------------------------------------------------------- Filter Data
-            function refresh(){
-                document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
-                loadEventsByDate();
+        }
 
-            }
+        // Filter Data
+        function refresh() {
+            document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+            loadEventsByDate();
+        }
 
-
-            function loadEventsByDate() {            
+        function loadEventsByDate() {
             const dateInput = document.getElementById('eventDate').value;
             const [year, month, day] = dateInput.split('-');
             const pageSize = document.getElementById('pageSize').value;
@@ -210,9 +226,17 @@
                 day: day,
                 pageNumber: 1,
                 pageSize: pageSize,
-                searchString: document.getElementById('searchString').value //just Use what i have
-                });
-                fetch(`${url}?${params.toString()}`)
+                searchString: document.getElementById('searchString').value
+            });
+
+            const spinner = document.querySelector('#loadingSpinner');
+            const eventsContainer = document.querySelector('#eventsContainer');
+
+            // Show spinner, fade out content
+            spinner.style.display = "block";
+            eventsContainer.style.opacity = "0";
+
+            fetch(`${url}?${params.toString()}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -220,40 +244,58 @@
                     return response.json();
                 })
                 .then(data => {
-                            const container = document.querySelector('#eventsContainer');
-                            if (data.isEmpty) {
-                                const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
-                                if (data.searchString) {
-                                    toastr.info(`No events found matching "${data.searchString}" for ${selectedDate}`);
-                                } else {
-                                    toastr.info(`No events for ${selectedDate}`);
-                                }
-                                if (!data.searchString) {
-                                    document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
-                                }
-                            } else if (container) {
-                                container.innerHTML = data.html;
-                            }
-                 })
+                    if (data.isEmpty) {
+                        const selectedDate = new Date(year, month - 1, day).toLocaleDateString();
+                        if (data.searchString) {
+                            toastr.info(`No events found matching "${data.searchString}" for ${selectedDate}`);
+                        } else {
+                            toastr.info(`No events for ${selectedDate}`);
+                        }
+                        if (!data.searchString) {
+                            document.getElementById('eventDate').value = '@DateTime.Today.ToString("yyyy-MM-dd")';
+                        }
+                    } else if (eventsContainer) {
+                        eventsContainer.innerHTML = data.html;
+                        // Re-add the spinner div after updating the container
+                        const spinnerDiv = document.createElement('div');
+                        spinnerDiv.id = 'loadingSpinner';
+                        spinnerDiv.style.display = 'none';
+                        spinnerDiv.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                        eventsContainer.prepend(spinnerDiv);
+                    }
+                    spinner.style.display = "none";
+                    eventsContainer.style.opacity = "1";
+                })
                 .catch(error => {
                     console.error('Error loading events:', error);
                     toastr.error('Failed to load events. Please try again.');
+                    spinner.style.display = "none";
+                    eventsContainer.style.opacity = "1";
                 });
-            }
-//----------------------------------------------------------------------------------------------------------------------------------- Handle Event Creation
-            function submitCreateEvent() {
+        }
+
+        // Handle Event Creation
+        function submitCreateEvent() {
             const form = document.getElementById('createEventForm');
+            const createButton = document.getElementById('createEventButton');
+            const buttonText = document.getElementById('createButtonText');
+            const spinner = document.getElementById('createSpinner');
 
             // Clear previous errors and invalid states
             document.querySelectorAll('.invalid-feedback').forEach(el => {
                 el.textContent = '';
-                const input = el.parentElement.querySelector('.form-control, .form-select'); // Catch both
-                if (input) { // Check if input exists
+                const input = el.parentElement.querySelector('.form-control, .form-select');
+                if (input) {
                     input.classList.remove('is-invalid');
                 }
             });
 
             if (form.checkValidity()) {
+                // Show spinner, hide button text, disable button
+                buttonText.style.display = 'none';
+                spinner.style.display = 'inline-block';
+                createButton.disabled = true;
+
                 const eventData = {
                     Title: document.getElementById('title').value,
                     Description: document.getElementById('description').value,
@@ -281,7 +323,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide(); // Cleaner close
+                    bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
                     form.reset();
                     toastr.success('Event created successfully!');
                     loadEventsByDate();
@@ -300,33 +342,50 @@
                     } else {
                         toastr.error('Failed to create event: ' + (error.message || 'Unknown error'));
                     }
+                })
+                .finally(() => {
+                    // Hide spinner, show button text, re-enable button
+                    buttonText.style.display = 'inline';
+                    spinner.style.display = 'none';
+                    createButton.disabled = false;
                 });
             } else {
                 form.reportValidity();
                 console.log('Form validation failed');
             }
-        }     
-//--------------------------------------------------------------------------------------------------------------------------------- Handles RSVP
-        let currentEventId = null; 
+        }
 
-        function openRSVPModal(evId){
+        // Handles RSVP
+        let currentEventId = null;
+
+        function openRSVPModal(evId) {
             currentEventId = evId;
         }
 
         function submitRSVPFromModal() {
-            console.log('submitRSVPFromModal called'); 
+            console.log('submitRSVPFromModal called');
             const form = document.getElementById('rsvpForm');
+            const rsvpButton = document.getElementById('rsvpButton');
+            const buttonText = document.getElementById('rsvpButtonText');
+            const spinner = document.getElementById('rsvpSpinner');
+
             if (!form.checkValidity()) {
-                console.log('Form validation failed'); 
+                console.log('Form validation failed');
                 form.reportValidity();
                 return;
             }
+
+            // Show spinner, hide button text, disable button
+            buttonText.style.display = 'none';
+            spinner.style.display = 'inline-block';
+            rsvpButton.disabled = true;
+
             const userName = document.getElementById('rsvpUserName').value;
             const response = document.getElementById('rsvpResponse').value;
             const evId = currentEventId;
-            console.log('Before payload, currentEventId:', currentEventId); 
+            console.log('Before payload, currentEventId:', currentEventId);
             const payload = { evId, userName, response };
-            console.log('Sending RSVP payload:', JSON.stringify(payload)); 
+            console.log('Sending RSVP payload:', JSON.stringify(payload));
 
             fetch('@Url.Action("RSVP", "Home")', {
                 method: 'POST',
@@ -346,14 +405,20 @@
                 if (data.success) {
                     toastr.success(data.message);
                     bootstrap.Modal.getInstance(document.getElementById('rsvpModal')).hide();
-                    form.reset()
-                    loadEventsByDate(); 
+                    form.reset();
+                    loadEventsByDate();
                 } else {
                     toastr.error(data.message);
                 }
             })
             .catch(error => {
                 toastr.error(error.error || 'Failed to RSVP');
+            })
+            .finally(() => {
+                // Hide spinner, show button text, re-enable button
+                buttonText.style.display = 'inline';
+                spinner.style.display = 'none';
+                rsvpButton.disabled = false;
             });
         }
     </script>
