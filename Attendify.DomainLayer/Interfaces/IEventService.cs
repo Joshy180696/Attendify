@@ -20,5 +20,7 @@ namespace Attendify.DomainLayer.Interfaces
 
         Task<EventListDto> GetEventDetailsAsync(int rsvpId);
 
+        Task<(bool success, string message)> DeleteEventAsync(int eventId);
+
     }
 }

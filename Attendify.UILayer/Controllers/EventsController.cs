@@ -24,7 +24,8 @@ namespace Attendify.UILayer.Controllers
 
         public async Task<IActionResult> Index(int? pageNumber, string sortBy = "", string sortDirection = "asc")
         {
-            var events = await _eventService.GetAllPaginatedEventsAsync(pageNumber ?? 1, 10, string.Empty, null, null, null, true, sortBy, sortDirection);
+            var events = await _eventService.GetAllPaginatedEventsAsync(pageNumber ?? 1, 10, string.Empty,
+                null, null, null, true, sortBy, sortDirection);
 
             return View(events);
         }
@@ -33,7 +34,8 @@ namespace Attendify.UILayer.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> LoadEvents(RequestEventsDto model)
         {
-            var events = await _eventService.GetAllPaginatedEventsAsync(model.pageNumber, model.pageSize, model.searchString ?? "", model.year, model.month, model.day, model.showAll, model.sortBy, model.sortDirection);
+            var events = await _eventService.GetAllPaginatedEventsAsync(model.pageNumber, model.pageSize, model.searchString ?? "",
+                model.year, model.month, model.day, model.showAll, model.sortBy, model.sortDirection);
             
             var html = await _viewRenderService.RenderViewToStringAsync("_EventsTable", events, ControllerContext); 
             return Json(new { html });
@@ -41,6 +43,8 @@ namespace Attendify.UILayer.Controllers
          
         }
 
+        [HttpGet]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Details(int id)
         {
             var eventEntity = await _eventService.GetEventDetailsAsync(id);
@@ -50,6 +54,28 @@ namespace Attendify.UILayer.Controllers
             }
             return View(eventEntity);
         }
+
+
+
+        [HttpDelete]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var response = await _eventService.DeleteEventAsync(id);
+                return Json(new { response.success, response.message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting event with ID {EventId}", id);
+                return Json(new { success = false, message = "Failed to delete event: " + ex.Message });
+            }
+
+
+        }
+
+
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -67,6 +67,7 @@ namespace Attendify.UILayer.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Create([FromBody] CreateEventDto eventDto)
         {
+            //if the event is the first the page will not update the partial because the first timne it loaded !model.any was already set so i need to count and redirect to index to reload
             _logger.LogInformation("Create request received: {@EventDto}", eventDto);
 
             if (!ModelState.IsValid)

@@ -57,5 +57,17 @@ namespace Attendify.DataLayer.Classes
             }
              _context.Events.Add(newEvent);
         }
+
+        public void DeleteEvent(Event ev)
+        {
+            if (ev == null) { throw new ArgumentNullException(nameof(ev), "Event cannot be null!"); }
+
+            _context.Events.Remove(ev);
+        }
+
+        public async Task<Event> GetEventByIdAsync(int id)
+        {
+            return await _context.Events.FindAsync(id);
+        }
     }
 }

@@ -11,9 +11,10 @@ namespace Attendify.DomainLayer.Interfaces
     public interface IEventsRepository
     {
         IQueryable<Event> GetEventList();
-        void CreateEvent(Event newEvent);
         IQueryable<Event> GetEventListWithDetails();
-
+        void CreateEvent(Event newEvent);
+        void DeleteEvent(Event ev);
+        Task<Event> GetEventByIdAsync(int id);
 
     }
 }

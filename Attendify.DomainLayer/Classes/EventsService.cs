@@ -99,10 +99,10 @@ namespace Attendify.DomainLayer.Classes
                 _logger.LogInformation("Event created successfully: {@Event}", entity);
                 return entity.Id;
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "An error occurred while creating a new event: {@Event}", newEvent);
-                throw new ApplicationException("An error occurred while creating a new event", ex);
+                throw;
             }
         }
 
@@ -140,7 +140,7 @@ namespace Attendify.DomainLayer.Classes
                 _logger.LogInformation("RSVP created successfully for event {EventId}: {@RSVP}", newRSVP.evId, rsvpEntity);
                 return (rsvpEntity.Id, true, "RSVP created successfully!");
             }
-            catch (Exception ex)
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Error creating RSVP for event {EventId}: {@RSVP}", newRSVP.evId, newRSVP);
                 throw; // Rethrow—let controller catch and format
@@ -171,6 +171,39 @@ namespace Attendify.DomainLayer.Classes
                     RSVPDate = r.RSVPDate,
                 }).ToList()
             };
+        }
+
+        public async Task<(bool success, string message)> DeleteEventAsync(int eventId)
+        {
+            if (eventId <= 0)
+            {
+                _logger.LogWarning("Delete event attempt failed: eventId {eventId} invalid ID", eventId);
+                return (false, "Invalid Event ID");
+            }
+
+            var existingEvent = await _unitOfWork.EventsRepository.GetEventByIdAsync(eventId);
+
+            if (existingEvent == null)
+            {
+                _logger.LogWarning("Delete event attempt failed: eventId {eventId} did not returned a valid record", eventId);
+                return (false, $"Delete operation failed the Event ID: {eventId} did not returned any event");
+            }
+
+            try
+            {
+                _unitOfWork.EventsRepository.DeleteEvent(existingEvent);
+                await _unitOfWork.CommitAsync();
+                _logger.LogInformation("Delete event attempt succeeded: eventId {eventId}", eventId);
+                return (true, $"The event and the rsvps were deleted successfully!");
+            }
+            catch (DbUpdateException ex)
+            {
+
+                _logger.LogError(ex, "Failed to delete event with ID {EventId} due to database error", eventId);
+                return (false, "Failed to delete event due to a database error. Please try again later.");
+            }
+
+      
         }
 
 

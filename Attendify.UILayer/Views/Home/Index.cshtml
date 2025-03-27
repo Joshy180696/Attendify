@@ -19,10 +19,10 @@
             <input type="date" id="eventDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="loadEventsByDate()" />
          
         </div>
-        <button type="button" id="refreshEvents" class="btn btn-secondary" title="Refresh Events" onclick="refresh()">
+        <button type="button" id="refreshEvents" class="btn btn-secondary btn-sm" title="Refresh Events" onclick="refresh()">
             Clear Filters
         </button>
-        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
     </div>
 </div>
 <hr />
@@ -34,7 +34,7 @@
         <div class="event-card empty-state">
             <h3>No Events Today</h3>
             <p class="date">Looks like it’s a quiet day!</p>
-            <p>Why not kick things off? <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
+            <p>Why not kick things off? <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#createEventModal">Create an Event</button></p>
         </div>
     </div>
 }else{
@@ -184,9 +184,7 @@
             }
 
 
-            function loadEventsByDate() {
-              
-                
+            function loadEventsByDate() {            
             const dateInput = document.getElementById('eventDate').value;
             const [year, month, day] = dateInput.split('-');
             const pageSize = document.getElementById('pageSize').value;
