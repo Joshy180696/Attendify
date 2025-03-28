@@ -94,7 +94,7 @@ Attendify follows an **N-layer architecture** to ensure modularity, scalability,
 
 Try Attendify now!
 
-- **Live App** – 🔗 [attendify.onrender.com](https://attendify.onrender.com)
+- **Live App** – 🔗 [attendify-3goc.onrender.com](https://attendify-3goc.onrender.com/)
 
 ### Demo Events
 The app is pre-populated with events for testing:
