@@ -82,11 +82,6 @@ Attendify follows an **N-layer architecture** to ensure modularity, scalability,
   - Interactive modals for creating events and submitting RSVPs.
   - Loading spinners for async operations (e.g., fetching events).
 
-### ⏳ Planned Features
-- 🔐 **User Authentication** – Add login and registration with JWT-based authentication.
-- 🏷 **Event Categories** – Organize events by categories (e.g., Social, Professional, Charity).
-- 📅 **Calendar View** – Display events in a calendar interface.
-- 🔔 **Notifications** – Email reminders for upcoming events and RSVP confirmations.
 
 ---
 
